@@ -9,7 +9,7 @@ const Login = ({ handleLogin }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/auth/login', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -18,14 +18,14 @@ const Login = ({ handleLogin }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Store the token in localStorage and pass it to the parent component to update authentication state
+        // Store token in localStorage
         localStorage.setItem('token', data.token);
-        handleLogin(data.token); // This will update the parent state
+        handleLogin(data.token); // Update parent component's authentication state
       } else {
-        setError(data.message);
+        setError(data.message || 'Invalid credentials');
       }
     } catch (err) {
-      setError('Error logging in');
+      setError('Network error: Unable to reach the backend');
     }
   };
 
@@ -49,7 +49,7 @@ const Login = ({ handleLogin }) => {
         />
         <button type="submit">Login</button>
       </form>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };

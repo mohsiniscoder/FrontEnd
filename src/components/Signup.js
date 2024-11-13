@@ -10,7 +10,7 @@ const Signup = ({ handleLogin }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/auth/signup', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
@@ -19,12 +19,14 @@ const Signup = ({ handleLogin }) => {
       const data = await response.json();
 
       if (response.ok) {
-        handleLogin(data.token); // Log in the user after successful signup
+        // Store token in localStorage after signup
+        localStorage.setItem('token', data.token);
+        handleLogin(data.token); // Log in the user after signup
       } else {
-        setError(data.message);
+        setError(data.message || 'Unable to create an account');
       }
     } catch (err) {
-      setError('Error signing up');
+      setError('Network error: Unable to reach the backend');
     }
   };
 
@@ -55,7 +57,7 @@ const Signup = ({ handleLogin }) => {
         />
         <button type="submit">Sign Up</button>
       </form>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };
